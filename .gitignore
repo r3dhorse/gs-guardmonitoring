@@ -1,0 +1,16 @@
+# Clasp
+.clasp.json
+
+# Node modules (if any)
+node_modules/
+
+# IDE settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

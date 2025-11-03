@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guard Monitoring System</title>
+  
+  <!-- Include Styles -->
+  <?!= HtmlService.createHtmlOutputFromFile('html/styles').getContent() ?>
+</head>
+<body>
+  <div id="app"></div>
+  
+  <!-- Include Scripts -->
+  <?!= HtmlService.createHtmlOutputFromFile('html/scripts-utils').getContent() ?>
+  <?!= HtmlService.createHtmlOutputFromFile('html/scripts-auth').getContent() ?>
+  <?!= HtmlService.createHtmlOutputFromFile('html/scripts-dashboard').getContent() ?>
+  <?!= HtmlService.createHtmlOutputFromFile('html/scripts-guards').getContent() ?>
+  <?!= HtmlService.createHtmlOutputFromFile('html/scripts-performance').getContent() ?>
+  <?!= HtmlService.createHtmlOutputFromFile('html/scripts-settings').getContent() ?>
+  <?!= HtmlService.createHtmlOutputFromFile('html/scripts-users').getContent() ?>
+  <?!= HtmlService.createHtmlOutputFromFile('html/scripts-main').getContent() ?>
+  
+  <!-- Include Modals -->
+  <?!= HtmlService.createHtmlOutputFromFile('html/modals').getContent() ?>
+</body>
+</html>
+
