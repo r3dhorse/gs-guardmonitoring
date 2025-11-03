@@ -4,9 +4,9 @@
  */
 
 const CONFIG = {
-  SPREADSHEET_ID: '1Kd0YdASFbB6dhUSCD0HbS01dWvUal79-6Jh3pVek-4Q',
-  GOOGLE_DRIVE_FOLDER_ID: '1hWMiF34dsF_tQy9xQ7YpNq_0U8JgH-U-', // Google Drive folder for PDF uploads
-  PHOTO_FOLDER_ID: '1GrKaffYzNiEwJGTNDyLRbJrboUGiVurU', // Google Drive folder for guard photos
+  SPREADSHEET_ID: '1Xn8m1xGA5iHY2FhTdjjA_lkBdXnIRg6eyqH52cOf07E',
+  GOOGLE_DRIVE_FOLDER_ID: '1fpB9sm0v3QN817plGXeDN_7DAmn662nY',
+  PHOTO_FOLDER_ID: '1yx8ZJZDrA971MVkopsR2eQsZmJPReu_X',
 
   SHEET_NAMES: {
     GUARDS: 'Guards',
