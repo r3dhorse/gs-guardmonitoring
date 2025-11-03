@@ -1563,17 +1563,32 @@
       <form id="changePasswordForm" novalidate style="display: grid; gap: 1rem;">
         <div>
           <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">Current Password *</label>
-          <input type="password" id="currentPassword" required autocomplete="current-password" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+          <div style="position: relative;">
+            <input type="password" id="currentPassword" required autocomplete="current-password" style="width: 100%; padding: 0.75rem 3rem 0.75rem 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+            <button type="button" onclick="togglePasswordVisibility('currentPassword')" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #81d742; cursor: pointer; padding: 0.5rem; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">
+              <span id="currentPasswordIcon">👁️</span>
+            </button>
+          </div>
         </div>
 
         <div>
           <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">New Password *</label>
-          <input type="password" id="newPassword" required autocomplete="new-password" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+          <div style="position: relative;">
+            <input type="password" id="newPassword" required autocomplete="new-password" style="width: 100%; padding: 0.75rem 3rem 0.75rem 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+            <button type="button" onclick="togglePasswordVisibility('newPassword')" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #81d742; cursor: pointer; padding: 0.5rem; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">
+              <span id="newPasswordIcon">👁️</span>
+            </button>
+          </div>
         </div>
 
         <div>
           <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">Confirm New Password *</label>
-          <input type="password" id="confirmPassword" required autocomplete="new-password" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+          <div style="position: relative;">
+            <input type="password" id="confirmPassword" required autocomplete="new-password" style="width: 100%; padding: 0.75rem 3rem 0.75rem 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+            <button type="button" onclick="togglePasswordVisibility('confirmPassword')" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #81d742; cursor: pointer; padding: 0.5rem; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">
+              <span id="confirmPasswordIcon">👁️</span>
+            </button>
+          </div>
         </div>
 
         <div style="display: flex; gap: 1rem; margin-top: 1rem;">
@@ -6319,6 +6334,14 @@
       document.getElementById('changePasswordForm').reset();
       document.getElementById('changePasswordErrorMessage').style.display = 'none';
       document.getElementById('changePasswordSuccessMessage').style.display = 'none';
+
+      // Reset password field types and icons
+      document.getElementById('currentPassword').type = 'password';
+      document.getElementById('newPassword').type = 'password';
+      document.getElementById('confirmPassword').type = 'password';
+      document.getElementById('currentPasswordIcon').textContent = '👁️';
+      document.getElementById('newPasswordIcon').textContent = '👁️';
+      document.getElementById('confirmPasswordIcon').textContent = '👁️';
     }
 
     function closeChangePasswordModal() {
@@ -6326,6 +6349,27 @@
       document.getElementById('changePasswordForm').reset();
       document.getElementById('changePasswordErrorMessage').style.display = 'none';
       document.getElementById('changePasswordSuccessMessage').style.display = 'none';
+
+      // Reset password field types and icons
+      document.getElementById('currentPassword').type = 'password';
+      document.getElementById('newPassword').type = 'password';
+      document.getElementById('confirmPassword').type = 'password';
+      document.getElementById('currentPasswordIcon').textContent = '👁️';
+      document.getElementById('newPasswordIcon').textContent = '👁️';
+      document.getElementById('confirmPasswordIcon').textContent = '👁️';
+    }
+
+    function togglePasswordVisibility(fieldId) {
+      const passwordField = document.getElementById(fieldId);
+      const iconSpan = document.getElementById(fieldId + 'Icon');
+
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        iconSpan.textContent = '🙈'; // Eye slash icon (hide)
+      } else {
+        passwordField.type = 'password';
+        iconSpan.textContent = '👁️'; // Eye icon (show)
+      }
     }
 
     function editUser(userId) {
