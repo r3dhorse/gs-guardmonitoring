@@ -963,7 +963,7 @@
             </div>
             <div>
               <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">End of Contract</label>
-              <input type="date" id="updateGuardEndContract" min="2024-01-01" max="2060-12-31" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+              <input type="date" id="updateGuardEndContract" min="2024-01-01" max="2060-12-31" onchange="validateExpiryDate(this)" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
             </div>
             <div>
               <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">Status *</label>
@@ -996,23 +996,23 @@
               </div>
               <div>
                 <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">License Expiry</label>
-                <input type="date" id="updateLicenseExpiry" min="2024-01-01" max="2060-12-31" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+                <input type="date" id="updateLicenseExpiry" min="2024-01-01" max="2060-12-31" onchange="validateExpiryDate(this)" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
               </div>
               <div>
                 <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">Police Clearance Validity</label>
-                <input type="date" id="updatePoliceClearance" min="2024-01-01" max="2060-12-31" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+                <input type="date" id="updatePoliceClearance" min="2024-01-01" max="2060-12-31" onchange="validateExpiryDate(this)" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
               </div>
               <div>
                 <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">NBI Clearance Validity</label>
-                <input type="date" id="updateNbiClearance" min="2024-01-01" max="2060-12-31" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+                <input type="date" id="updateNbiClearance" min="2024-01-01" max="2060-12-31" onchange="validateExpiryDate(this)" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
               </div>
               <div>
                 <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">Drug Test Validity</label>
-                <input type="date" id="updateDrugTestValidity" min="2024-01-01" max="2060-12-31" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+                <input type="date" id="updateDrugTestValidity" min="2024-01-01" max="2060-12-31" onchange="validateExpiryDate(this)" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
               </div>
               <div>
                 <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">Neuro Exam Validity</label>
-                <input type="date" id="updateNeuroExamValidity" min="2024-01-01" max="2060-12-31" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+                <input type="date" id="updateNeuroExamValidity" min="2024-01-01" max="2060-12-31" onchange="validateExpiryDate(this)" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
               </div>
             </div>
           </div>
@@ -4107,6 +4107,9 @@
 
         document.getElementById('updateGuardErrorMessage').style.display = 'none';
         document.getElementById('updateGuardSuccessMessage').style.display = 'none';
+
+        // Validate all expiry dates to highlight expired ones
+        setTimeout(() => validateAllExpiryDates(), 100);
       } catch (error) {
         console.error('Error in editGuard:', error);
         alert('Error opening update modal: ' + error.message);
@@ -4717,6 +4720,69 @@
       document.getElementById('updateGuardBMI').value = '';
       document.getElementById('updateBmiStatus').textContent = '-';
       document.getElementById('updateBmiStatus').style.color = 'rgba(255,255,255,0.7)';
+
+      // Reset all date field borders
+      const dateFields = [
+        'updateGuardEndContract',
+        'updateLicenseExpiry',
+        'updatePoliceClearance',
+        'updateNbiClearance',
+        'updateDrugTestValidity',
+        'updateNeuroExamValidity'
+      ];
+      dateFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+          field.style.borderColor = 'rgba(129, 215, 66, 0.3)';
+          field.style.borderWidth = '2px';
+          field.style.boxShadow = 'none';
+        }
+      });
+    }
+
+    // Validate single expiry date field
+    function validateExpiryDate(inputElement) {
+      if (!inputElement.value) {
+        // No date entered - reset to default border
+        inputElement.style.borderColor = 'rgba(129, 215, 66, 0.3)';
+        inputElement.style.borderWidth = '2px';
+        return;
+      }
+
+      const inputDate = new Date(inputElement.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day
+
+      if (inputDate < today) {
+        // Date is expired - red border with animation
+        inputElement.style.borderColor = '#EF4444';
+        inputElement.style.borderWidth = '2px';
+        inputElement.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+      } else {
+        // Date is valid - green border
+        inputElement.style.borderColor = 'rgba(129, 215, 66, 0.3)';
+        inputElement.style.borderWidth = '2px';
+        inputElement.style.boxShadow = 'none';
+      }
+    }
+
+    // Validate all expiry date fields
+    function validateAllExpiryDates() {
+      const dateFields = [
+        'updateGuardEndContract',
+        'updateLicenseExpiry',
+        'updatePoliceClearance',
+        'updateNbiClearance',
+        'updateDrugTestValidity',
+        'updateNeuroExamValidity'
+      ];
+
+      dateFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+          validateExpiryDate(field);
+        }
+      });
     }
 
     // Add Performance Modal Functions
