@@ -963,7 +963,7 @@
             </div>
             <div>
               <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">End of Contract</label>
-              <input type="date" id="updateGuardEndContract" min="2024-01-01" max="2060-12-31" onchange="validateExpiryDate(this)" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+              <input type="date" id="updateGuardEndContract" min="2024-01-01" max="2060-12-31" style="width: 100%; padding: 0.75rem; border: 2px solid rgba(129, 215, 66, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
             </div>
             <div>
               <label style="display: block; color: #81d742; margin-bottom: 0.5rem; font-weight: 600;">Status *</label>
@@ -4723,7 +4723,6 @@
 
       // Reset all date field borders
       const dateFields = [
-        'updateGuardEndContract',
         'updateLicenseExpiry',
         'updatePoliceClearance',
         'updateNbiClearance',
@@ -4769,7 +4768,6 @@
     // Validate all expiry date fields
     function validateAllExpiryDates() {
       const dateFields = [
-        'updateGuardEndContract',
         'updateLicenseExpiry',
         'updatePoliceClearance',
         'updateNbiClearance',
