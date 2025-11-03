@@ -2264,6 +2264,11 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.25M15.54 15.54l4.24 4.25M1 12h6M17 12h6M4.22 19.78l4.24-4.25M15.54 8.46l4.24-4.25"></path></svg>
                 <span style="font-weight: 500; ${isSidebarOpen ? '' : 'display: none;'}">Settings</span>
               </div>
+
+              <div class="sidebar-menu-item ${currentView === 'systemlogs' ? 'active' : ''}" onclick="navigateTo('systemlogs')" style="padding: 1rem ${isSidebarOpen ? '1.5rem' : '0'}; color: white; cursor: pointer; display: flex; align-items: center; ${isSidebarOpen ? 'gap: 0.75rem' : 'justify-content: center'}; border-left: 4px solid transparent;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span style="font-weight: 500; ${isSidebarOpen ? '' : 'display: none;'}">System Logs</span>
+              </div>
               ` : ''}
             </nav>
 
@@ -2296,6 +2301,8 @@
           return renderUsersView();
         case 'settings':
           return renderSettingsView();
+        case 'systemlogs':
+          return renderSystemLogsView();
         default:
           return renderDashboardView();
       }
@@ -6891,6 +6898,180 @@
           </div>
         </div>
       `;
+    }
+
+    function renderSystemLogsView() {
+      setTimeout(() => {
+        loadSystemLogs();
+      }, 100);
+
+      return `
+        <div>
+          <h1 style="color: #81d742; font-size: 2rem; margin: 0 0 0.5rem;">System Logs</h1>
+          <p style="color: white; opacity: 0.7; margin: 0 0 2rem;">Audit trail and system activity monitoring</p>
+
+          <!-- Logs Container -->
+          <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; padding: 2rem;">
+
+            <!-- Filter Controls -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+              <input
+                type="text"
+                id="logsSearchInput"
+                placeholder="Search by username, action, or target..."
+                onkeyup="filterSystemLogs()"
+                style="flex: 1; min-width: 250px; padding: 0.75rem; border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 0.95rem;"
+              >
+              <select
+                id="logsActionFilter"
+                onchange="filterSystemLogs()"
+                style="padding: 0.75rem; border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 0.95rem; cursor: pointer;"
+              >
+                <option value="">All Actions</option>
+                <option value="LOGIN">Login</option>
+                <option value="LOGOUT">Logout</option>
+                <option value="CREATE">Create</option>
+                <option value="UPDATE">Update</option>
+                <option value="DELETE">Delete</option>
+              </select>
+              <button
+                onclick="loadSystemLogs()"
+                style="background: #81d742; color: #006341; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s ease; font-size: 0.95rem;"
+                onmouseover="this.style.background='#6bc92b'"
+                onmouseout="this.style.background='#81d742'"
+              >
+                🔄 Refresh
+              </button>
+            </div>
+
+            <!-- Logs Table -->
+            <div style="overflow-x: auto;">
+              <table id="systemLogsTable" style="width: 100%; border-collapse: collapse; color: white;">
+                <thead>
+                  <tr style="background: rgba(129, 215, 66, 0.1); border-bottom: 2px solid rgba(129, 215, 66, 0.3);">
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: #81d742;">Timestamp</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: #81d742;">Username</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: #81d742;">Action</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: #81d742;">Target Type</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: #81d742;">Target Name</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: #81d742;">Details</th>
+                  </tr>
+                </thead>
+                <tbody id="systemLogsTableBody">
+                  <tr>
+                    <td colspan="6" style="padding: 2rem; text-align: center; color: rgba(255,255,255,0.5);">
+                      Loading system logs...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Info -->
+            <div id="logsPaginationInfo" style="margin-top: 1.5rem; text-align: center; color: rgba(255,255,255,0.7); font-size: 0.9rem;"></div>
+
+          </div>
+        </div>
+      `;
+    }
+
+    // System Logs Functions
+    let allSystemLogs = [];
+
+    function loadSystemLogs() {
+      showToast('info', 'Loading', 'Fetching system logs...');
+
+      google.script.run
+        .withSuccessHandler((logs) => {
+          allSystemLogs = logs;
+          displaySystemLogs(logs);
+          showToast('success', 'Success', `Loaded ${logs.length} log entries`);
+        })
+        .withFailureHandler((error) => {
+          showToast('error', 'Error', 'Failed to load system logs: ' + error.message);
+          document.getElementById('systemLogsTableBody').innerHTML = `
+            <tr>
+              <td colspan="6" style="padding: 2rem; text-align: center; color: #FCA5A5;">
+                Error loading logs: ${error.message}
+              </td>
+            </tr>
+          `;
+        })
+        .getRecentActivity(500);  // Get last 500 audit entries
+    }
+
+    function displaySystemLogs(logs) {
+      const tbody = document.getElementById('systemLogsTableBody');
+      const paginationInfo = document.getElementById('logsPaginationInfo');
+
+      if (!logs || logs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="padding: 2rem; text-align: center; color: rgba(255,255,255,0.5);">
+              No system logs found
+            </td>
+          </tr>
+        `;
+        paginationInfo.textContent = '';
+        return;
+      }
+
+      tbody.innerHTML = logs.map(log => {
+        const timestamp = new Date(log.timestamp);
+        const formattedTime = timestamp.toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+
+        // Color code actions
+        let actionColor = '#81d742';
+        if (log.action.includes('DELETE')) actionColor = '#EF4444';
+        else if (log.action.includes('UPDATE')) actionColor = '#FBBF24';
+        else if (log.action.includes('CREATE')) actionColor = '#10B981';
+        else if (log.action.includes('LOGIN')) actionColor = '#3B82F6';
+
+        return `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); transition: background 0.2s ease;" onmouseover="this.style.background='rgba(129, 215, 66, 0.05)'" onmouseout="this.style.background='transparent'">
+            <td style="padding: 1rem; font-size: 0.9rem;">${formattedTime}</td>
+            <td style="padding: 1rem; font-weight: 600;">${log.username || 'System'}</td>
+            <td style="padding: 1rem;">
+              <span style="background: ${actionColor}33; color: ${actionColor}; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                ${log.action}
+              </span>
+            </td>
+            <td style="padding: 1rem;">${log.targetType || '-'}</td>
+            <td style="padding: 1rem; font-weight: 500;">${log.targetName || '-'}</td>
+            <td style="padding: 1rem; font-size: 0.9rem; opacity: 0.8;">${log.details || '-'}</td>
+          </tr>
+        `;
+      }).join('');
+
+      paginationInfo.textContent = `Showing ${logs.length} log ${logs.length === 1 ? 'entry' : 'entries'}`;
+    }
+
+    function filterSystemLogs() {
+      const searchInput = document.getElementById('logsSearchInput').value.toLowerCase();
+      const actionFilter = document.getElementById('logsActionFilter').value;
+
+      let filtered = allSystemLogs.filter(log => {
+        const matchesSearch = !searchInput ||
+          (log.username && log.username.toLowerCase().includes(searchInput)) ||
+          (log.action && log.action.toLowerCase().includes(searchInput)) ||
+          (log.targetType && log.targetType.toLowerCase().includes(searchInput)) ||
+          (log.targetName && log.targetName.toLowerCase().includes(searchInput)) ||
+          (log.details && log.details.toLowerCase().includes(searchInput));
+
+        const matchesAction = !actionFilter ||
+          (log.action && log.action.includes(actionFilter));
+
+        return matchesSearch && matchesAction;
+      });
+
+      displaySystemLogs(filtered);
     }
 
   </script>
