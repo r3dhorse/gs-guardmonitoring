@@ -23,7 +23,7 @@ function setupSheets() {
 
     // Add default admin user if sheet is empty
     if (usersSheet.getLastRow() === 1) {
-      const defaultPassword = hashPassword('ChangeMe2025!'); // Stronger default password
+      const defaultPassword = hashPassword('admin123'); // Stronger default password
       usersSheet.appendRow([
         'USR001',
         'admin',
@@ -38,7 +38,7 @@ function setupSheets() {
         JSON.stringify([defaultPassword]), // Password History
         'TRUE' // Force Password Change on first login
       ]);
-      Logger.log('Default admin user created with password: ChangeMe2025! (MUST BE CHANGED ON FIRST LOGIN)');
+      Logger.log('Default admin user created with password: admin123 (MUST BE CHANGED ON FIRST LOGIN)');
     }
 
     // Create Guards sheet
@@ -111,13 +111,13 @@ function setupSheets() {
 
     // Try to show alert if in spreadsheet context, otherwise return message
     try {
-      SpreadsheetApp.getUi().alert('Setup Complete!', 'All sheets have been created successfully.\n\nDefault login:\nUsername: admin\nPassword: ChangeMe2025!\n\n⚠️ You must change this password on first login.', SpreadsheetApp.getUi().ButtonSet.OK);
+      SpreadsheetApp.getUi().alert('Setup Complete!', 'All sheets have been created successfully.\n\nDefault login:\nUsername: admin\nPassword: admin123\n\n⚠️ You must change this password on first login.', SpreadsheetApp.getUi().ButtonSet.OK);
     } catch (e) {
       // Not in UI context, return success message
       Logger.log('Returning success message (web app context)');
       return {
         success: true,
-        message: 'Setup complete! All sheets created successfully. Default login: admin / ChangeMe2025!'
+        message: 'Setup complete! All sheets created successfully. Default login: admin / admin123'
       };
     }
 
@@ -182,7 +182,7 @@ function resetDatabase() {
       try {
         SpreadsheetApp.getUi().alert(
           'Database Reset Complete!',
-          `All sheets have been deleted and rebuilt.\n\nSheets deleted: ${deletedCount}\nSheets created: ${sheetNames.length}\n\nDefault login:\nUsername: admin\nPassword: ChangeMe2025!\n\n⚠️ You must change this password on first login.`,
+          `All sheets have been deleted and rebuilt.\n\nSheets deleted: ${deletedCount}\nSheets created: ${sheetNames.length}\n\nDefault login:\nUsername: admin\nPassword: admin123\n\n⚠️ You must change this password on first login.`,
           SpreadsheetApp.getUi().ButtonSet.OK
         );
       } catch (e) {
@@ -191,7 +191,7 @@ function resetDatabase() {
 
       return {
         success: true,
-        message: `Database reset complete! ${deletedCount} sheets deleted and ${sheetNames.length} sheets recreated. Default login: admin / ChangeMe2025!`,
+        message: `Database reset complete! ${deletedCount} sheets deleted and ${sheetNames.length} sheets recreated. Default login: admin / admin123`,
         deletedCount: deletedCount,
         createdCount: sheetNames.length
       };
