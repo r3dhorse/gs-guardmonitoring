@@ -84,7 +84,7 @@ function getRecentActivity(limit) {
 
       activities.push({
         auditId: row[0] ? row[0].toString() : '',
-        timestamp: row[1], // Keep as Date object for sorting
+        timestamp: row[1] ? row[1].toString() : '', // Convert to string for serialization
         timestampFormatted: timestampFormatted,
         username: row[2] ? row[2].toString() : '',
         action: row[3] ? row[3].toString() : '',
@@ -98,9 +98,13 @@ function getRecentActivity(limit) {
 
     // Sort by timestamp descending (newest first)
     activities.sort((a, b) => {
-      const dateA = a.timestamp instanceof Date ? a.timestamp : new Date(a.timestamp);
-      const dateB = b.timestamp instanceof Date ? b.timestamp : new Date(b.timestamp);
-      return dateB - dateA;
+      try {
+        const dateA = new Date(a.timestamp);
+        const dateB = new Date(b.timestamp);
+        return dateB - dateA;
+      } catch (e) {
+        return 0;
+      }
     });
 
     // Limit results

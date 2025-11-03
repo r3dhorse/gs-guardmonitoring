@@ -6980,14 +6980,25 @@
 
     function loadSystemLogs() {
       showToast('info', 'Loading', 'Fetching system logs...');
+      console.log('Loading system logs...');
 
       google.script.run
         .withSuccessHandler((logs) => {
+          console.log('Received logs:', logs);
+          console.log('Number of logs:', logs ? logs.length : 0);
+
+          if (!logs) {
+            console.error('Logs is null or undefined');
+            showToast('error', 'Error', 'No data received from server');
+            return;
+          }
+
           allSystemLogs = logs;
           displaySystemLogs(logs);
           showToast('success', 'Success', `Loaded ${logs.length} log entries`);
         })
         .withFailureHandler((error) => {
+          console.error('Error loading logs:', error);
           showToast('error', 'Error', 'Failed to load system logs: ' + error.message);
           document.getElementById('systemLogsTableBody').innerHTML = `
             <tr>
