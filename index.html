@@ -6967,8 +6967,16 @@
               </table>
             </div>
 
-            <!-- Pagination Info -->
-            <div id="logsPaginationInfo" style="margin-top: 1.5rem; text-align: center; color: rgba(255,255,255,0.7); font-size: 0.9rem;"></div>
+            <!-- Pagination Controls -->
+            <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+
+              <!-- Pagination Info -->
+              <div id="logsPaginationInfo" style="color: rgba(255,255,255,0.7); font-size: 0.9rem;"></div>
+
+              <!-- Pagination Buttons -->
+              <div id="logsPaginationControls" style="display: flex; gap: 0.5rem; align-items: center;"></div>
+
+            </div>
 
           </div>
         </div>
@@ -6977,6 +6985,9 @@
 
     // System Logs Functions
     let allSystemLogs = [];
+    let filteredSystemLogs = [];
+    let currentLogsPage = 1;
+    const logsPerPage = 10;
 
     function loadSystemLogs() {
       showToast('info', 'Loading', 'Fetching system logs...');
@@ -6994,6 +7005,7 @@
           }
 
           allSystemLogs = logs;
+          currentLogsPage = 1; // Reset to first page
           displaySystemLogs(logs);
           showToast('success', 'Success', `Loaded ${logs.length} log entries`);
         })
@@ -7014,6 +7026,10 @@
     function displaySystemLogs(logs) {
       const tbody = document.getElementById('systemLogsTableBody');
       const paginationInfo = document.getElementById('logsPaginationInfo');
+      const paginationControls = document.getElementById('logsPaginationControls');
+
+      // Store filtered logs
+      filteredSystemLogs = logs;
 
       if (!logs || logs.length === 0) {
         tbody.innerHTML = `
@@ -7024,10 +7040,18 @@
           </tr>
         `;
         paginationInfo.textContent = '';
+        paginationControls.innerHTML = '';
         return;
       }
 
-      tbody.innerHTML = logs.map(log => {
+      // Calculate pagination
+      const totalPages = Math.ceil(logs.length / logsPerPage);
+      const startIndex = (currentLogsPage - 1) * logsPerPage;
+      const endIndex = startIndex + logsPerPage;
+      const paginatedLogs = logs.slice(startIndex, endIndex);
+
+      // Display table rows
+      tbody.innerHTML = paginatedLogs.map(log => {
         const timestamp = new Date(log.timestamp);
         const formattedTime = timestamp.toLocaleString('en-US', {
           year: 'numeric',
@@ -7061,7 +7085,13 @@
         `;
       }).join('');
 
-      paginationInfo.textContent = `Showing ${logs.length} log ${logs.length === 1 ? 'entry' : 'entries'}`;
+      // Update pagination info
+      const showingFrom = startIndex + 1;
+      const showingTo = Math.min(endIndex, logs.length);
+      paginationInfo.textContent = `Showing ${showingFrom}-${showingTo} of ${logs.length} log ${logs.length === 1 ? 'entry' : 'entries'}`;
+
+      // Generate pagination controls
+      renderLogsPagination(totalPages);
     }
 
     function filterSystemLogs() {
@@ -7082,7 +7112,105 @@
         return matchesSearch && matchesAction;
       });
 
+      // Reset to page 1 when filtering
+      currentLogsPage = 1;
       displaySystemLogs(filtered);
+    }
+
+    function renderLogsPagination(totalPages) {
+      const paginationControls = document.getElementById('logsPaginationControls');
+
+      if (totalPages <= 1) {
+        paginationControls.innerHTML = '';
+        return;
+      }
+
+      let paginationHTML = '';
+
+      // Previous button
+      paginationHTML += `
+        <button
+          onclick="goToLogsPage(${currentLogsPage - 1})"
+          ${currentLogsPage === 1 ? 'disabled' : ''}
+          style="padding: 0.5rem 1rem; background: ${currentLogsPage === 1 ? 'rgba(255,255,255,0.1)' : 'rgba(129,215,66,0.2)'}; color: ${currentLogsPage === 1 ? 'rgba(255,255,255,0.3)' : '#81d742'}; border: 1px solid ${currentLogsPage === 1 ? 'rgba(255,255,255,0.1)' : 'rgba(129,215,66,0.3)'}; border-radius: 6px; cursor: ${currentLogsPage === 1 ? 'not-allowed' : 'pointer'}; font-weight: 600; transition: all 0.2s;"
+        >
+          ← Previous
+        </button>
+      `;
+
+      // Page numbers (show max 5 pages)
+      const maxPagesToShow = 5;
+      let startPage = Math.max(1, currentLogsPage - Math.floor(maxPagesToShow / 2));
+      let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+      // Adjust startPage if we're near the end
+      if (endPage - startPage < maxPagesToShow - 1) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+      }
+
+      // First page + ellipsis
+      if (startPage > 1) {
+        paginationHTML += `
+          <button
+            onclick="goToLogsPage(1)"
+            style="padding: 0.5rem 0.75rem; background: rgba(129,215,66,0.2); color: #81d742; border: 1px solid rgba(129,215,66,0.3); border-radius: 6px; cursor: pointer; font-weight: 600; min-width: 40px; transition: all 0.2s;"
+          >
+            1
+          </button>
+        `;
+        if (startPage > 2) {
+          paginationHTML += `<span style="color: rgba(255,255,255,0.5); padding: 0 0.5rem;">...</span>`;
+        }
+      }
+
+      // Page number buttons
+      for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === currentLogsPage;
+        paginationHTML += `
+          <button
+            onclick="goToLogsPage(${i})"
+            style="padding: 0.5rem 0.75rem; background: ${isActive ? '#81d742' : 'rgba(129,215,66,0.2)'}; color: ${isActive ? '#006341' : '#81d742'}; border: 1px solid ${isActive ? '#81d742' : 'rgba(129,215,66,0.3)'}; border-radius: 6px; cursor: pointer; font-weight: ${isActive ? '700' : '600'}; min-width: 40px; transition: all 0.2s;"
+          >
+            ${i}
+          </button>
+        `;
+      }
+
+      // Ellipsis + last page
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          paginationHTML += `<span style="color: rgba(255,255,255,0.5); padding: 0 0.5rem;">...</span>`;
+        }
+        paginationHTML += `
+          <button
+            onclick="goToLogsPage(${totalPages})"
+            style="padding: 0.5rem 0.75rem; background: rgba(129,215,66,0.2); color: #81d742; border: 1px solid rgba(129,215,66,0.3); border-radius: 6px; cursor: pointer; font-weight: 600; min-width: 40px; transition: all 0.2s;"
+          >
+            ${totalPages}
+          </button>
+        `;
+      }
+
+      // Next button
+      paginationHTML += `
+        <button
+          onclick="goToLogsPage(${currentLogsPage + 1})"
+          ${currentLogsPage === totalPages ? 'disabled' : ''}
+          style="padding: 0.5rem 1rem; background: ${currentLogsPage === totalPages ? 'rgba(255,255,255,0.1)' : 'rgba(129,215,66,0.2)'}; color: ${currentLogsPage === totalPages ? 'rgba(255,255,255,0.3)' : '#81d742'}; border: 1px solid ${currentLogsPage === totalPages ? 'rgba(255,255,255,0.1)' : 'rgba(129,215,66,0.3)'}; border-radius: 6px; cursor: ${currentLogsPage === totalPages ? 'not-allowed' : 'pointer'}; font-weight: 600; transition: all 0.2s;"
+        >
+          Next →
+        </button>
+      `;
+
+      paginationControls.innerHTML = paginationHTML;
+    }
+
+    function goToLogsPage(page) {
+      const totalPages = Math.ceil(filteredSystemLogs.length / logsPerPage);
+      if (page < 1 || page > totalPages) return;
+
+      currentLogsPage = page;
+      displaySystemLogs(filteredSystemLogs);
     }
 
   </script>
